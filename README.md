@@ -31,3 +31,5 @@ Sinta-se à vontade para contribuir! Se você tiver alguma sugestão de melhoria
 ## Licença
 
 Este projeto está licenciado sob a [MIT License](https://opensource.org/licenses/MIT).
+
+[![Netlify Status](https://api.netlify.com/api/v1/badges/71934c4f-7bce-430b-b112-3bb990449f8d/deploy-status)](https://app.netlify.com/sites/tecnng/deploys)
