@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gabriel Silva Oliveira - Tecnologia</title>
+  <!-- Dependências -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <!-- PrismJS para syntax highlighting -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/themes/prism.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/components/prism-python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/components/prism-javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.28.0/components/prism-markup.min.js"></script>
+  <!-- Skulpt para execução de código Python no navegador -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/skulpt/1.0.0/skulpt.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/skulpt/1.0.0/skulpt-stdlib.js"></script>
+  <script src="/static/globes.js"></script>
+  <!-- Estilos -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <style id="customCSS"></style>
+  <!-- Estilos básicos para o modal (não altera o CSS principal) -->
+  <style>
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+    }
+    .modal-content {
+      background-color: #fff;
+      margin: 10% auto;
+      padding: 20px;
+      border-radius: 5px;
+      width: 90%;
+      max-width: 600px;
+      position: relative;
+    }
+    .modal-content h2 {
+      margin-top: 0;
+    }
+    .modal .close {
+      color: #aaa;
+      float: right;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      position: absolute;
+      top: 10px;
+      right: 15px;
+    }
+    .modal .close:hover {
+      color: #000;
+    }
+  </style>
+</head>
+<body class="parallax-bg">
+  <div class="container">
+    <!-- Cabeçalho com Efeito Parallax -->
+    <header class="cabecalho">
+      <h1>Gabriel Silva Oliveira</h1>
+      <p>Explorando o mundo e projetando o futuro com <span class="glitch">tecnologia</span> e inovação</p>
+    </header>
+
+    <!-- Painel Admin -->
+    <section id="adminLoginSection" class="secao">
+      <h2>Administração</h2>
+      <div id="adminLogin">
+        <input type="password" id="adminPassword" placeholder="Senha Administrativa">
+        <button onclick="adminLogin()"><i class="fas fa-lock"></i> Login</button>
+      </div>
+      <div id="adminPanel" style="display: none;">
+        <h3>Painel de Edição</h3>
+        <div class="admin-actions">
+          <button onclick="addNewSection()"><i class="fas fa-plus"></i> Nova Seção</button>
+          <button onclick="addNewPage()"><i class="fas fa-file"></i> Nova Página</button>
+          <button onclick="showFullCode()"><i class="fas fa-code"></i> Exibir Código Completo</button>
+        </div>
+        <!-- Árvore de Arquivos -->
+        <div class="file-tree" id="fileTree">
+          <ul>
+            <li data-file="templates/index.html">index.html</li>
+            <li data-file="static/style.css">style.css</li>
+            <li data-file="static/script.js">script.js</li>
+            <li data-file="app.py">app.py</li>
+          </ul>
+        </div>
+        <!-- Editor de Código -->
+        <div class="editor-container">
+          <textarea id="codeEditor"></textarea>
+          <button onclick="confirmChange()">Salvar</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sobre Mim -->
+    <section class="secao sobre-mim">
+      <h2>Sobre Mim</h2>
+      <div class="grid">
+        <div class="profile">
+          <img src="{{ url_for('static', filename='profile.jpg') }}" alt="Gabriel Silva Oliveira">
+          <div class="info">
+            <h3>Gabriel Silva Oliveira</h3>
+            <p>Engenheiro de Software | Entusiasta de Tecnologia</p>
+          </div>
+        </div>
+        <div class="descricao">
+          <p>Olá! Meu nome é Gabriel Silva Oliveira, e sou apaixonado por tecnologia e inovação. Com experiência em desenvolvimento web e machine learning, estou sempre buscando novos desafios e projetos interessantes.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Habilidades e Terminal Interativo -->
+    <section class="secao habilidades">
+      <h2>Habilidades em Programação</h2>
+      <div class="grid">
+        <div class="habilidade">
+          <h3>Python</h3>
+          <p>Experiência em automação, desenvolvimento web (Flask/Django), análise de dados e machine learning.</p>
+        </div>
+        <div class="habilidade">
+          <h3>JavaScript</h3>
+          <p>Criação de interfaces interativas para a web, integração com APIs e desenvolvimento full-stack (Node.js).</p>
+        </div>
+        <div class="habilidade">
+          <h3>SQL</h3>
+          <p>Gestão de bancos de dados relacionais, otimização de consultas e modelagem de dados complexos.</p>
+        </div>
+        <div class="habilidade">
+          <h3>Java</h3>
+          <p>Desenvolvimento de aplicativos robustos e escaláveis com foco em orientação a objetos.</p>
+        </div>
+        <div class="habilidade">
+          <h3>C#</h3>
+          <p>Desenvolvimento de software e aplicações desktop, além de integração com sistemas corporativos.</p>
+        </div>
+      </div>
+      <!-- Terminal Interativo -->
+      <div class="terminal">
+        <h2>Terminal Interativo</h2>
+        <label for="languageSelect">Escolha a linguagem:</label>
+        <select id="languageSelect">
+          <option value="python">Python</option>
+          <option value="javascript">JavaScript</option>
+          <option value="java">Java</option>
+          <option value="csharp">C#</option>
+        </select>
+        <textarea id="codeInput" placeholder="Digite seu código aqui..."></textarea>
+        <button onclick="executeCode()">Executar Código</button>
+        <button onclick="copyToClipboard()">Copiar para Bloco de Notas</button>
+        <pre id="output"></pre>
+      </div>
+    </section>
+
+    <!-- Contato -->
+    <section class="secao contato">
+      <h2>Contato</h2>
+      <div class="grid">
+        <div class="contact-info">
+          <p>Email: gs4523314@gmail.com</p>
+          <p>GitHub: <a href="https://github.com/Gabriel0900" target="_blank">GitHub</a></p>
+          </div>
+
+        <div class="social-media">
+          <a href="https://instagram.com/gabrielsylvaol" target="_blank"><i class="fab fa-instagram"></i></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Gerador de Imagem -->
+    <section class="generator-section secao">
+      <h2><i class="fas fa-magic"></i> Gerador de Conteúdo</h2>
+      <div class="grid-container">
+        <div class="card">
+          <h3>Gerar Imagem</h3>
+          <form id="api-image-form">
+            <input type="text" id="api-prompt" placeholder="Descreva sua imagem..." required>
+            <select id="modelSelector">
+              <option value="stable-diffusion">Stable Diffusion</option>
+            </select>
+            <button type="submit"><i class="fas fa-image"></i> Gerar</button>
+          </form>
+          <div id="api-image-result"></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Modal para Exibir Exemplos -->
+  <div id="projectModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h2 id="modalTitle">Título do Projeto</h2>
+      <div id="modalContent">
+        <p>Conteúdo do exemplo...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="{{ url_for('static', filename='globes.js') }}"></script>
+  <script>
+    // Função para abrir modal com o conteúdo de exemplo
+    function openModal(title, content) {
+      document.getElementById('modalTitle').innerText = title;
+      document.getElementById('modalContent').innerHTML = content;
+      document.getElementById('projectModal').style.display = 'block';
+      Prism.highlightAllUnder(document.getElementById('modalContent'));
+    }
+
+    // Fechar modal
+    document.querySelector('#projectModal .close').addEventListener('click', function() {
+      document.getElementById('projectModal').style.display = 'none';
+    });
+
+    // Lida com cliques nos botões de exemplo dos projetos
+    document.querySelectorAll('.btn-detalhes').forEach(btn => {
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const projectId = this.getAttribute('data-project');
+        if (projectId === 'projeto1') {
+          openModal('Plataforma de Análise de Dados Empresariais', `
+            <p>Exemplo demonstrativo da plataforma que coleta, analisa e visualiza dados empresariais.</p>
+            <p>Ferramentas: Python, Flask, Pandas, Matplotlib e SQL.</p>
+          `);
+        } else if (projectId === 'projeto2') {
+          openModal('Modelo de IA para Detecção de Fraudes', `
+            <p>Exemplo do modelo de Machine Learning para detectar fraudes em transações financeiras.</p>
+            <p>Tecnologias: TensorFlow, Python, e análise de dados.</p>
+          `);
+        } else if (projectId === 'cybersecurity') {
+          openModal('Automação de Detecção de Cibersegurança', `
+            <p>Ferramenta automatizada que realiza testes de penetração, análise de malware e varredura de vulnerabilidades.</p>
+            <p><strong>Identidade:</strong> admin@example.com</p>
+            <p><strong>IP:</strong> 192.168.0.1</p>
+            <p>Exemplo de código em Python:</p>
+            <pre><code class="language-python">
+import socket
+
+def get_system_info():
+    hostname = socket.gethostname()
+    ip_address = socket.gethostbyname(hostname)
+    return hostname, ip_address
+
+if __name__ == '__main__':
+    host, ip = get_system_info()
+    print(f"Identidade: {host}")
+    print(f"IP: {ip}")
+            </code></pre>
+          `);
+        } else if (projectId === 'multilanguage') {
+          openModal('Exemplos Multilíngues de Desenvolvimento', `
+            <p>Aqui estão exemplos de como implementar a mesma funcionalidade em diferentes linguagens:</p>
+            <ul>
+              <li><strong>Python:</strong> Utilizando Flask para criar uma API RESTful.</li>
+              <li><strong>JavaScript:</strong> Usando Node.js e Express para o mesmo propósito.</li>
+              <li><strong>C#:</strong> Implementação com ASP.NET Core Web API.</li>
+              <li><strong>Ruby:</strong> Exemplo com Ruby on Rails.</li>
+            </ul>
+          `);
+        } else {
+          openModal('Projeto Desconhecido', `<p>Nenhum exemplo disponível.</p>`);
+        }
+      });
+    });
+
+    // Função para exibir o código completo (app.py, index.html e globes.js)
+    function showFullCode() {
+      axios.get('/admin/exibir-codigo')
+        .then(response => {
+          const { app_py, index_html, globes_js } = response.data;
+          const content = `
+            <h3>app.py</h3>
+            <pre><code class="language-python">${escapeHtml(app_py)}</code></pre>
+            <h3>index.html</h3>
+            <pre><code class="language-markup">${escapeHtml(index_html)}</code></pre>
+            <h3>globes.js</h3>
+            <pre><code class="language-javascript">${escapeHtml(globes_js)}</code></pre>
+          `;
+          openModal('Código Completo', content);
+        })
+        .catch(error => {
+          alert('Erro ao carregar código: ' + error.message);
+        });
+    }
+
+    // Funções para Admin e Editor
+    function initializeEditors() {
+      document.querySelectorAll('.file-tree li').forEach(item => {
+        item.addEventListener('click', () => {
+          document.querySelectorAll('.file-tree li').forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+          const filePath = item.getAttribute('data-file');
+          loadFile(filePath);
+        });
+      });
+    }
+
+    function loadFile(filePath) {
+      axios.get(`/code/${filePath}`).then(response => {
+        document.getElementById('codeEditor').value = response.data;
+        document.getElementById('codeEditor').focus();
+      }).catch(error => {
+        alert(`Erro ao carregar arquivo: ${error.message}`);
+      });
+    }
+
+    function adminLogin() {
+      const password = document.getElementById('adminPassword').value;
+      if (password === '006698') {
+        document.getElementById('adminLogin').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        initializeEditors();
+        document.querySelectorAll('.admin-only').forEach(btn => btn.style.display = 'inline-block');
+      } else {
+        alert('Senha incorreta!');
+      }
+    }
+
+    function confirmChange() {
+      const filePath = document.querySelector('.file-tree li.active').getAttribute('data-file');
+      const content = document.getElementById('codeEditor').value;
+      axios.post('/update-content', {
+        type: filePath,
+        content: content,
+        password: '006698'
+      }).then(() => {
+        alert('Alterações salvas!');
+      }).catch(error => alert(error.message));
+    }
+
+    function addNewSection() {
+      const sectionName = prompt('Nome da nova seção:');
+      if (sectionName) {
+        const newSection = `
+          <section class="secao dynamic-section">
+            <h2>${escapeHtml(sectionName)}</h2>
+            <div class="grid">
+              <div class="project">
+                <h3>Novo Projeto</h3>
+                <pre><code>// Código aqui</code></pre>
+              </div>
+            </div>
+          </section>
+        `;
+        document.querySelector('.container').insertAdjacentHTML('beforeend', newSection);
+        saveDynamicContent(newSection);
+      }
+    }
+
+    function addNewPage() {
+      const pageName = prompt('Nome da nova página:');
+      if (pageName) {
+        axios.post('/create-page', { 
+          pageName: pageName,
+          password: '006698'
+        }).then(() => {
+          alert(`Página ${escapeHtml(pageName)} criada!`);
+          window.location.href = `/${encodeURIComponent(pageName)}`;
+        }).catch(error => alert(error.message));
+      }
+    }
+
+    function escapeHtml(unsafe) {
+      return unsafe
+           .replace(/&/g, "&amp;")
+           .replace(/</g, "&lt;")
+           .replace(/>/g, "&gt;")
+           .replace(/"/g, "&quot;")
+           .replace(/'/g, "&#039;");
+    }
+
+    function saveDynamicContent(content) {
+      console.log('Conteúdo dinâmico salvo:', content);
+    }
+
+    // Função para executar código do terminal interativo
+    function runPythonCode() {
+      const code = document.getElementById('codeInput').value;
+      const outputEl = document.getElementById('output');
+      outputEl.textContent = '';
+      function outf(text) {
+        outputEl.textContent += text;
+      }
+      function builtinRead(x) {
+        if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+          throw "File not found: '" + x + "'";
+        return Sk.builtinFiles["files"][x];
+      }
+      Sk.configure({ output: outf, read: builtinRead });
+      Sk.misceval.asyncToPromise(function() {
+        return Sk.importMainWithBody("<stdin>", false, code, true);
+      }).then(function(mod) {
+          console.log('Código Python executado com sucesso.');
+      }, function(err) {
+          outputEl.textContent = 'Erro: ' + err.toString();
+      });
+    }
+
+    function executeCode() {
+      const language = document.getElementById('languageSelect').value;
+      const outputEl = document.getElementById('output');
+      if (language === 'javascript') {
+        try {
+          const code = document.getElementById('codeInput').value;
+          const result = eval(code);
+          outputEl.textContent = result !== undefined ? result : 'Código executado com sucesso!';
+        } catch (err) {
+          outputEl.textContent = 'Erro: ' + err.message;
+        }
+      } else if (language === 'python') {
+        runPythonCode();
+      } else {
+        outputEl.textContent = 'Execução para ' + language + ' não implementada.';
+      }
+    }
+
+    // Função para copiar código para a área de transferência (para usar no Bloco de Notas)
+    function copyToClipboard() {
+      const code = document.getElementById('codeInput').value;
+      navigator.clipboard.writeText(code).then(() => {
+        alert('Código copiado! Abra o Bloco de Notas e cole o código.');
+      }).catch(err => {
+        alert('Erro ao copiar código: ' + err);
+      });
+    }
+
+    document.getElementById('codeEditor').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && e.ctrlKey) {
+        confirmChange();
+      }
+    });
+
+    document.getElementById('api-image-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const prompt = document.getElementById('api-prompt').value;
+      const model = document.getElementById('modelSelector').value;
+      try {
+        const response = await axios.post('/gerar-imagem', { prompt, model });
+        const img = document.createElement('img');
+        img.src = `data:image/png;base64,${response.data.imagem_base64}`;
+        document.getElementById('api-image-result').innerHTML = `<div class="generated-image">${img.outerHTML}</div>`;
+      } catch (error) {
+        alert(`Erro: ${error.message}`);
+      }
+    });
+  </script>
+</body>
+</html>
