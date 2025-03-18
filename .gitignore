@@ -1,0 +1,9 @@
+# Ignorar arquivos sensíveis
+.env
+
+# Ignorar diretórios e arquivos de ambiente virtual
+venv/
+__pycache__/
+
+# Ignorar configurações de IDEs
+.vscode/
